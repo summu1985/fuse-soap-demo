@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<wsdl:definitions xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
+	xmlns:tns="http://www.example.org/CreateCustomer_WSDL/"
+	xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+	name="CreateCustomer" targetNamespace="http://www.example.org/CreateCustomer_WSDL/">
+
+
+	<!-- Type definitions for input and output messages -->
+	
+	<wsdl:types>
+		<xsd:schema targetNamespace="http://www.example.org/CreateCustomer_WSDL/">
+			<xsd:element name="CreateCustomerRequest">
+				<xsd:complexType>
+					<xsd:sequence>
+						<xsd:element name="CustID" type="xsd:string" />
+						<xsd:element name="FirstName" type="xsd:string" />
+						<xsd:element name="LastName" type="xsd:string" />
+						<xsd:element name="City" type="xsd:string" />
+						<xsd:element name="Pincode" type="xsd:string" />
+					</xsd:sequence>
+				</xsd:complexType>
+			</xsd:element>
+			<xsd:element name="CreateCustomerResponse">
+				<xsd:complexType>
+					<xsd:sequence>
+						<xsd:element name="Status" type="xsd:string" />
+					</xsd:sequence>
+				</xsd:complexType>
+			</xsd:element>
+		</xsd:schema>
+	</wsdl:types>
+
+	
+	<!-- Message definitions for input and output -->
+	
+	<wsdl:message name="CreateCustomerRequest">
+		<wsdl:part name="in" element="tns:CreateCustomerRequest" />
+	</wsdl:message>
+	<wsdl:message name="CreateCustomerResponse">
+		<wsdl:part element="tns:CreateCustomerResponse" name="out" />
+	</wsdl:message>
+
+	<!-- Port (interface) definitions -->
+	
+	<wsdl:portType name="CreateCustomerEndpoint">
+		<wsdl:operation name="CreateCustomer">
+			<wsdl:input message="tns:CreateCustomerRequest" />
+			<wsdl:output message="tns:CreateCustomerResponse" />
+		</wsdl:operation>
+	</wsdl:portType>
+
+	<!-- Port bindings to transports and encoding - HTTP, document literal encoding is used -->
+	
+	<wsdl:binding name="CreateCustomerBinding" type="tns:CreateCustomerEndpoint">
+		<soap:binding style="document"
+			transport="http://schemas.xmlsoap.org/soap/http" />
+		<wsdl:operation name="CreateCustomer">
+			<soap:operation
+				soapAction="http://www.example.org/CreateCustomer_WSDL/CreateCustomer" />
+			<wsdl:input>
+				<soap:body use="literal" parts="in"/>
+			</wsdl:input>
+			<wsdl:output>
+				<soap:body use="literal" parts="out"/>
+			</wsdl:output>
+		</wsdl:operation>
+	</wsdl:binding>
+	
+	<wsdl:service name="CreateCustomerEndpointService">
+		<wsdl:port binding="tns:CreateCustomerBinding" name="CreateCustomerService">
+			<soap:address location="http://0.0.0.0:8080/webservices/CreateCustomer" />
+		</wsdl:port>
+	</wsdl:service>
+</wsdl:definitions>

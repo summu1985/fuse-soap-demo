@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:cxf="http://camel.apache.org/schema/cxf"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.springframework.org/schema/beans https://www.springframework.org/schema/beans/spring-beans.xsd             http://camel.apache.org/schema/spring       https://camel.apache.org/schema/spring/camel-spring.xsd             http://camel.apache.org/schema/cxf    http://camel.apache.org/schema/cxf/camel-cxf.xsd">
+    <!-- Data Source Declaration -->
+    <bean class="org.apache.commons.dbcp.BasicDataSource"
+        destroy-method="close" id="mysqlDataSource" scope="singleton">
+        <property name="driverClassName" value="com.mysql.jdbc.Driver"/>
+        <property name="url" value="jdbc:mysql://mysql:3306/sampledb"/>
+        <property name="username" value="fuse"/>
+        <property name="password" value="fuse"/>
+    </bean>
+    <bean class="org.apache.camel.component.sql.SqlComponent" id="sql" scope="singleton">
+        <property name="dataSource" ref="mysqlDataSource"/>
+    </bean>
+    <cxf:cxfEndpoint
+        address="http://0.0.0.0:8080/webservices/CreateCustomer"
+        id="CreateCustomerEndpoint"
+        serviceClass="org.example.createcustomer_wsdl.CreateCustomerEndpoint" wsdlURL="WSDL/GetFullName.wsdl"/>
+    <bean class="org.mycompany.CreateCustomerProcessor" id="ProcessCreateCustomer"/>
+    <camelContext id="camel" xmlns="http://camel.apache.org/schema/spring">
+        <route id="simple-route">
+            <from id="_from1" uri="cxf:bean:CreateCustomerEndpoint"/>
+            <convertBodyTo id="_convertBodyTo1" type="org.example.createcustomer_wsdl.CreateCustomerRequest"/>
+            <log id="_log1" message="Request Received : ${body.getFirstName()}"/>
+            <setHeader headerName="CustID" id="_setHeader1">
+                <simple>${body.getCustID()}</simple>
+            </setHeader>
+            <setHeader headerName="FirstName" id="_setHeader2">
+                <simple>${body.getFirstName()}</simple>
+            </setHeader>
+            <setHeader headerName="LastName" id="_setHeader3">
+                <simple>${body.getLastName()}</simple>
+            </setHeader>
+            <setHeader headerName="City" id="_setHeader11">
+                <simple>${body.getCity()}</simple>
+            </setHeader>
+            <setHeader headerName="Pincode" id="_setHeader12">
+                <simple>${body.getPincode()}</simple>
+            </setHeader>
+            <to id="_to1" uri="sql:insert into customer(custid, firstName, lastName, city, pincode) values (:#CustID, :#FirstName, :#LastName, :#City, :#Pincode)"/>
+            <process id="ProcessCustomerCreation" ref="ProcessCreateCustomer"/>
+            <convertBodyTo id="_convertBodyTo2" type="org.example.createcustomer_wsdl.CreateCustomerResponse"/>
+            <log id="_log2" message="Reached here "/>
+        </route>
+    </camelContext>
+</beans>
